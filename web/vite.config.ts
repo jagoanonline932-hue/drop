@@ -15,12 +15,23 @@ import { restart } from './plugins/restart';
 import { restartEnvFileChange } from './plugins/restartEnvFileChange';
 
 export default defineConfig({
-  envPrefix: 'NEXT_PUBLIC_',
+  envPrefix: [
+    'NEXT_PUBLIC_',
+    'VITE_',
+  ],
+
+  appType: 'spa',
 
   optimizeDeps: {
     include: [
       'fast-glob',
       'lucide-react',
+      'react',
+      'react-dom',
+      'react-router-dom',
+      '@chakra-ui/react',
+      'motion',
+      'recharts',
     ],
 
     exclude: [
@@ -38,7 +49,24 @@ export default defineConfig({
 
   build: {
     outDir: 'build/client',
-    chunkSizeWarningLimit: 2000,
+
+    assetsDir: 'assets',
+
+    sourcemap: false,
+
+    minify: 'esbuild',
+
+    cssMinify: true,
+
+    chunkSizeWarningLimit: 3000,
+
+    target: 'es2022',
+
+    modulePreload: {
+      polyfill: true,
+    },
+
+    reportCompressedSize: false,
 
     rollupOptions: {
       output: {
@@ -46,11 +74,24 @@ export default defineConfig({
           react: [
             'react',
             'react-dom',
+            'react-router',
             'react-router-dom',
+          ],
+
+          ui: [
+            '@chakra-ui/react',
+            'lucide-react',
+            'classnames',
+            'tailwind-merge',
           ],
 
           charts: [
             'recharts',
+          ],
+
+          forms: [
+            'react-hook-form',
+            'yup',
           ],
 
           editor: [
@@ -58,11 +99,26 @@ export default defineConfig({
             '@dnd-kit/sortable',
           ],
 
-          ui: [
-            '@chakra-ui/react',
-            'lucide-react',
+          animation: [
+            'motion',
+            'three',
+          ],
+
+          utils: [
+            'date-fns',
+            'lodash-es',
+            'papaparse',
           ],
         },
+
+        chunkFileNames:
+          'assets/js/[name]-[hash].js',
+
+        entryFileNames:
+          'assets/js/[name]-[hash].js',
+
+        assetFileNames:
+          'assets/[ext]/[name]-[hash].[ext]',
       },
     },
   },
@@ -73,17 +129,22 @@ export default defineConfig({
     restartEnvFileChange(),
 
     reactRouterHonoServer({
-      serverEntryPoint: './src/__create/index.ts',
+      serverEntryPoint:
+        './src/__create/index.ts',
+
       runtime: 'node',
     }),
 
     babel({
-      include: ['src/**/*.{js,jsx,ts,tsx}'],
+      include: [
+        'src/**/*.{js,jsx,ts,tsx}',
+      ],
 
       exclude: /node_modules/,
 
       babelConfig: {
         babelrc: false,
+
         configFile: false,
 
         plugins: [
@@ -109,7 +170,9 @@ export default defineConfig({
 
     addRenderIds(),
 
-    reactRouter(),
+    reactRouter({
+      appDirectory: 'src/app',
+    }),
 
     tsconfigPaths(),
 
@@ -146,12 +209,33 @@ export default defineConfig({
         __dirname,
         '../shared'
       ),
+
+      '@components': path.resolve(
+        __dirname,
+        './src/components'
+      ),
+
+      '@app': path.resolve(
+        __dirname,
+        './src/app'
+      ),
+
+      '@lib': path.resolve(
+        __dirname,
+        './src/lib'
+      ),
     },
 
     dedupe: [
       'react',
       'react-dom',
     ],
+  },
+
+  define: {
+    __DEV__:
+      process.env.NODE_ENV !==
+      'production',
   },
 
   clearScreen: false,
@@ -163,8 +247,13 @@ export default defineConfig({
 
     port: 4000,
 
+    strictPort: false,
+
+    cors: true,
+
     fs: {
       allow: [
+        '.',
         '..',
         '../shared',
         '../../shared',
@@ -173,14 +262,23 @@ export default defineConfig({
 
     hmr: {
       overlay: false,
+
+      port: 4000,
     },
 
     warmup: {
       clientFiles: [
         './src/app/**/*',
+        './src/components/**/*',
         './src/app/root.tsx',
         './src/app/routes.ts',
       ],
     },
+  },
+
+  preview: {
+    host: '0.0.0.0',
+
+    port: 4173,
   },
 });

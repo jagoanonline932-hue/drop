@@ -11,25 +11,30 @@
 
   "homepage": "https://hyperdrop.vercel.app",
 
+  "license": "MIT",
+
+  "packageManager": "bun@1.3.12",
+
   "engines": {
-    "node": ">=20.0.0",
-    "npm": ">=10.0.0"
+    "node": ">=24.0.0",
+    "npm": ">=11.0.0",
+    "bun": ">=1.3.12"
   },
 
   "scripts": {
     "dev": "react-router dev",
 
-    "build": "vite build",
+    "build": "node ./scripts/vercel-build.mjs && vite build",
 
     "start": "vite preview",
 
-    "preview": "vite preview",
+    "preview": "vite preview --host 0.0.0.0 --port 4173",
 
     "typecheck": "react-router typegen && tsc --noEmit",
 
     "clean": "rm -rf node_modules .vite build dist .turbo",
 
-    "reinstall": "npm run clean && npm install",
+    "reinstall": "npm run clean && bun install",
 
     "deploy:vercel": "vercel --prod",
 
@@ -49,7 +54,21 @@
 
     "animation": "echo '🎬 Smooth Enterprise Animation System Loaded'",
 
-    "deploy": "npm run hyperdrop && npm run developer && npm run dx && npm run build"
+    "vercel:info": "echo '▲ Deploying HyperDrop Enterprise on Vercel'",
+
+    "vercel:node": "node -e \"console.log('🟢 Node Version:', process.version)\"",
+
+    "vercel:system": "node -e \"console.log('⚡ Runtime: Bun + Vite + React Router + Hono')\"",
+
+    "vercel:memory": "node -e \"console.log('🧠 Enterprise Memory Optimization Enabled')\"",
+
+    "vercel:chunks": "node -e \"console.log('📦 Advanced Rollup Chunk Splitting Enabled')\"",
+
+    "vercel:designer": "node -e \"console.log('🎨 HyperDrop UI/UX Professional Engine Loaded')\"",
+
+    "vercel:complete": "node -e \"console.log('✅ Build Pipeline Initialized Successfully')\"",
+
+    "deploy": "npm run hyperdrop && npm run developer && npm run dx && npm run animation && npm run build"
   },
 
   "dependencies": {
@@ -123,7 +142,7 @@
     "@testing-library/jest-dom": "^6.6.4",
     "@testing-library/react": "^16.3.0",
     "@types/micromatch": "^4.0.9",
-    "@types/node": "^20",
+    "@types/node": "^24.0.0",
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.1",
     "@types/ws": "^8.18.1",
@@ -135,8 +154,8 @@
     "postcss": "^8.5.3",
     "tailwindcss": "3",
     "typescript": "^5.8.3",
-    "vite": "^6.3.3",
-    "vite-plugin-babel": "^1.3.1",
+    "vite": "^6.4.1",
+    "vite-plugin-babel": "^1.5.1",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.2.4"
   },

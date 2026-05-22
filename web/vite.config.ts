@@ -36,6 +36,37 @@ export default defineConfig({
 
   logLevel: 'info',
 
+  build: {
+    outDir: 'build/client',
+    chunkSizeWarningLimit: 2000,
+
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: [
+            'react',
+            'react-dom',
+            'react-router-dom',
+          ],
+
+          charts: [
+            'recharts',
+          ],
+
+          editor: [
+            '@dnd-kit/core',
+            '@dnd-kit/sortable',
+          ],
+
+          ui: [
+            '@chakra-ui/react',
+            'lucide-react',
+          ],
+        },
+      },
+    },
+  },
+
   plugins: [
     nextPublicProcessEnv(),
 
@@ -48,12 +79,16 @@ export default defineConfig({
 
     babel({
       include: ['src/**/*.{js,jsx,ts,tsx}'],
+
       exclude: /node_modules/,
 
       babelConfig: {
         babelrc: false,
         configFile: false,
-        plugins: ['styled-jsx/babel'],
+
+        plugins: [
+          'styled-jsx/babel',
+        ],
       },
     }),
 

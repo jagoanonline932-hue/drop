@@ -1,3 +1,7 @@
-export const DoesNotExist = () => 'fixed';
+export const DoesNotExist = () => {
+  return <div>fixed</div>;
+};
 
-export const SomethingElse = () => 'not what you wanted';
+export const SomethingElse = () => {
+  return <div>not what you wanted</div>;
+};

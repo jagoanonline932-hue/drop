@@ -1,72 +1,45 @@
 {
   "name": "web",
-
   "private": true,
-
   "type": "module",
-
   "author": "Atedy",
-
   "description": "HyperDrop Enterprise SaaS Platform — Professional Animated Developer Experience",
-
   "homepage": "https://hyperdrop.vercel.app",
-
   "license": "MIT",
 
   "packageManager": "bun@1.3.12",
 
   "engines": {
-  "node": "24.x",
-  "npm": "11.x",
-  "bun": "1.3.12"
-},
-"packageManager": "bun@1.3.12"
+    "node": "24.x",
+    "npm": "11.x",
+    "bun": "1.3.12"
+  },
 
   "scripts": {
     "dev": "react-router dev --host 0.0.0.0",
-
     "build": "npm run vercel:banner && vite build",
-
     "start": "vite preview --host 0.0.0.0 --port 4173",
-
     "preview": "vite preview --host 0.0.0.0 --port 4173",
-
     "typecheck": "react-router typegen && tsc --noEmit",
-
     "clean": "rm -rf node_modules .vite build dist .turbo",
-
     "reinstall": "npm run clean && bun install",
-
     "deploy:vercel": "vercel --prod",
-
     "analyze": "vite build --mode analyze",
-
     "dev:host": "react-router dev --host 0.0.0.0",
-
     "build:prod": "NODE_ENV=production vite build",
-
     "lint:fix": "eslint . --fix",
 
     "hyperdrop": "echo '🚀 HyperDrop Enterprise Build Ready'",
-
     "developer": "echo '👨‍💻 Developed by Atedy'",
-
     "dx": "echo '✨ Professional Developer Experience Enabled'",
-
     "animation": "echo '🎬 Smooth Enterprise Animation System Loaded'",
 
     "vercel:info": "node -e \"console.log('\\n▲ HyperDrop Enterprise Deployment Initialized')\"",
-
     "vercel:node": "node -e \"console.log('🟢 Node Runtime:', process.version)\"",
-
     "vercel:system": "node -e \"console.log('⚡ Runtime Stack: Bun + Vite + React Router + Hono')\"",
-
     "vercel:memory": "node -e \"console.log('🧠 Enterprise Memory Optimization Enabled')\"",
-
     "vercel:chunks": "node -e \"console.log('📦 Advanced Rollup Chunk Splitting Enabled')\"",
-
     "vercel:designer": "node -e \"console.log('🎨 HyperDrop UI/UX Professional Engine Loaded')\"",
-
     "vercel:complete": "node -e \"console.log('✅ Build Pipeline Initialized Successfully\\n')\"",
 
     "vercel:banner": "npm run hyperdrop && npm run developer && npm run dx && npm run animation && npm run vercel:info && npm run vercel:node && npm run vercel:system && npm run vercel:memory && npm run vercel:chunks && npm run vercel:designer && npm run vercel:complete",

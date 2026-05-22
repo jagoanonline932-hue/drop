@@ -4,11 +4,11 @@ export default function Page() {
   const Widget =
     helpers.DoesNotExist ??
     helpers.SomethingElse ??
-    (() => <div>Widget Not Found</div>);
+    (() => 'Widget Not Found');
 
   return (
     <div>
-      <Widget />
+      {Widget()}
     </div>
   );
 }

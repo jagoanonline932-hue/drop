@@ -1,7 +1,11 @@
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 import { reactRouter } from '@react-router/dev/vite';
 import { reactRouterHonoServer } from 'react-router-hono-server/dev';
+
 import { defineConfig } from 'vite';
+
 import babel from 'vite-plugin-babel';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
@@ -14,6 +18,14 @@ import { nextPublicProcessEnv } from './plugins/nextPublicProcessEnv';
 import { restart } from './plugins/restart';
 import { restartEnvFileChange } from './plugins/restartEnvFileChange';
 
+const __filename = fileURLToPath(
+  import.meta.url
+);
+
+const __dirname = path.dirname(
+  __filename
+);
+
 export default defineConfig({
   envPrefix: [
     'NEXT_PUBLIC_',
@@ -24,23 +36,38 @@ export default defineConfig({
 
   optimizeDeps: {
     include: [
-      'fast-glob',
-      'lucide-react',
       'react',
       'react-dom',
+      'react-router',
       'react-router-dom',
+
+      'fast-glob',
+      'lucide-react',
+
       '@chakra-ui/react',
+
       'motion',
+
       'recharts',
+
+      'lodash-es',
+
+      'date-fns',
     ],
 
     exclude: [
       '@hono/auth-js/react',
+
       '@hono/auth-js',
+
       '@auth/core',
+
       'hono/context-storage',
+
       '@auth/core/errors',
+
       'fsevents',
+
       'lightningcss',
     ],
   },
@@ -48,7 +75,11 @@ export default defineConfig({
   logLevel: 'info',
 
   build: {
+    target: 'es2022',
+
     outDir: 'build/client',
+
+    emptyOutDir: true,
 
     assetsDir: 'assets',
 
@@ -58,15 +89,15 @@ export default defineConfig({
 
     cssMinify: true,
 
+    reportCompressedSize: false,
+
     chunkSizeWarningLimit: 3000,
 
-    target: 'es2022',
+    copyPublicDir: true,
 
     modulePreload: {
       polyfill: true,
     },
-
-    reportCompressedSize: false,
 
     rollupOptions: {
       output: {
@@ -85,13 +116,13 @@ export default defineConfig({
             'tailwind-merge',
           ],
 
-          charts: [
-            'recharts',
-          ],
-
           forms: [
             'react-hook-form',
             'yup',
+          ],
+
+          charts: [
+            'recharts',
           ],
 
           editor: [
@@ -105,9 +136,9 @@ export default defineConfig({
           ],
 
           utils: [
-            'date-fns',
             'lodash-es',
             'papaparse',
+            'date-fns',
           ],
         },
 
@@ -157,8 +188,10 @@ export default defineConfig({
       restart: [
         'src/**/page.jsx',
         'src/**/page.tsx',
+
         'src/**/layout.jsx',
         'src/**/layout.tsx',
+
         'src/**/route.js',
         'src/**/route.ts',
       ],
@@ -205,9 +238,9 @@ export default defineConfig({
         './src'
       ),
 
-      '@shared': path.resolve(
+      '@app': path.resolve(
         __dirname,
-        '../shared'
+        './src/app'
       ),
 
       '@components': path.resolve(
@@ -215,14 +248,14 @@ export default defineConfig({
         './src/components'
       ),
 
-      '@app': path.resolve(
-        __dirname,
-        './src/app'
-      ),
-
       '@lib': path.resolve(
         __dirname,
         './src/lib'
+      ),
+
+      '@shared': path.resolve(
+        __dirname,
+        '../shared'
       ),
     },
 
@@ -236,6 +269,10 @@ export default defineConfig({
     __DEV__:
       process.env.NODE_ENV !==
       'production',
+
+    'process.env.NODE_ENV': JSON.stringify(
+      process.env.NODE_ENV
+    ),
   },
 
   clearScreen: false,
@@ -254,8 +291,11 @@ export default defineConfig({
     fs: {
       allow: [
         '.',
+
         '..',
+
         '../shared',
+
         '../../shared',
       ],
     },
@@ -263,14 +303,19 @@ export default defineConfig({
     hmr: {
       overlay: false,
 
+      host: 'localhost',
+
       port: 4000,
     },
 
     warmup: {
       clientFiles: [
         './src/app/**/*',
+
         './src/components/**/*',
+
         './src/app/root.tsx',
+
         './src/app/routes.ts',
       ],
     },

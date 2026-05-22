@@ -6,7 +6,6 @@ import {
 
 import {
   join,
-  relative,
   sep,
 } from 'node:path';
 
@@ -36,6 +35,10 @@ type Tree = {
 
   hasLayout: boolean;
 
+  pageFile?: string;
+
+  layoutFile?: string;
+
   isParam: boolean;
 
   paramName: string;
@@ -51,11 +54,21 @@ function normalizePath(
     .join('/');
 }
 
+function safeReadDir(
+  dir: string
+) {
+  try {
+    return readdirSync(dir);
+  } catch {
+    return [];
+  }
+}
+
 function buildRouteTree(
   dir: string,
   basePath = ''
 ): Tree {
-  const files = readdirSync(dir);
+  const files = safeReadDir(dir);
 
   const node: Tree = {
     path: basePath,
@@ -65,6 +78,10 @@ function buildRouteTree(
     hasPage: false,
 
     hasLayout: false,
+
+    pageFile: undefined,
+
+    layoutFile: undefined,
 
     isParam: false,
 
@@ -108,8 +125,13 @@ function buildRouteTree(
       file
     );
 
-    const stat =
-      statSync(filePath);
+    let stat;
+
+    try {
+      stat = statSync(filePath);
+    } catch {
+      continue;
+    }
 
     if (stat.isDirectory()) {
       const childPath =
@@ -126,16 +148,26 @@ function buildRouteTree(
       node.children.push(
         childNode
       );
-    } else if (
+
+      continue;
+    }
+
+    if (
       file === 'page.jsx' ||
       file === 'page.tsx'
     ) {
       node.hasPage = true;
-    } else if (
+
+      node.pageFile = file;
+    }
+
+    if (
       file === 'layout.jsx' ||
       file === 'layout.tsx'
     ) {
       node.hasLayout = true;
+
+      node.layoutFile = file;
     }
   }
 
@@ -152,6 +184,7 @@ function transformSegment(
     const param =
       segment.slice(1, -1);
 
+    // [...slug]
     if (
       param.startsWith(
         '...'
@@ -160,6 +193,7 @@ function transformSegment(
       return '*';
     }
 
+    // [[slug]]
     if (
       param.startsWith('[') &&
       param.endsWith(']')
@@ -170,6 +204,7 @@ function transformSegment(
       )}?`;
     }
 
+    // [id]
     return `:${param}`;
   }
 
@@ -190,6 +225,45 @@ function createComponentPath(
   )}`;
 }
 
+function hasPageFile(
+  routePath: string
+) {
+  return (
+    existsSync(
+      join(
+        APP_DIR,
+        routePath,
+        'page.tsx'
+      )
+    ) ||
+    existsSync(
+      join(
+        APP_DIR,
+        routePath,
+        'page.jsx'
+      )
+    )
+  );
+}
+
+function getPageFile(
+  routePath: string
+) {
+  if (
+    existsSync(
+      join(
+        APP_DIR,
+        routePath,
+        'page.tsx'
+      )
+    )
+  ) {
+    return 'page.tsx';
+  }
+
+  return 'page.jsx';
+}
+
 function generateRoutes(
   node: Tree
 ): RouteConfigEntry[] {
@@ -199,24 +273,20 @@ function generateRoutes(
   const routePath =
     node.path
       .split('/')
+      .filter(Boolean)
       .map(transformSegment)
       .join('/');
 
-  const pagePath =
-    createComponentPath(
-      node.path,
-      existsSync(
-        join(
-          APP_DIR,
-          node.path,
-          'page.tsx'
-        )
-      )
-        ? 'page.tsx'
-        : 'page.jsx'
-    );
+  if (
+    node.hasPage &&
+    hasPageFile(node.path)
+  ) {
+    const pagePath =
+      createComponentPath(
+        node.path,
+        getPageFile(node.path)
+      );
 
-  if (node.hasPage) {
     if (node.path === '') {
       routes.push(
         index(pagePath)
@@ -240,6 +310,9 @@ function generateRoutes(
   return routes;
 }
 
+/**
+ * 🚀 HMR + Auto Route Discovery
+ */
 if (import.meta.env.DEV) {
   import.meta.glob(
     './app/**/page.{jsx,tsx}'
@@ -251,22 +324,48 @@ if (import.meta.env.DEV) {
 
   if (import.meta.hot) {
     import.meta.hot.accept(() => {
+      console.clear();
+
+      console.log(
+        '⚡ HyperDrop Route Engine Reloaded'
+      );
+
       import.meta.hot?.invalidate();
     });
   }
 }
 
+/**
+ * 🧠 Build Route Tree
+ */
 const tree = buildRouteTree(
   APP_DIR
 );
 
-const routes = [
-  ...generateRoutes(tree),
+/**
+ * 📦 Generate All Routes
+ */
+const generatedRoutes =
+  generateRoutes(tree);
 
-  route(
-    '*',
-    './__create/not-found.tsx'
-  ),
+/**
+ * ❌ Global Not Found Route
+ */
+const notFoundRoute = route(
+  '*',
+  './__create/not-found.tsx'
+);
+
+/**
+ * ✅ Final Export
+ */
+const routes: RouteConfigEntry[] = [
+  ...generatedRoutes,
+  notFoundRoute,
 ];
+
+console.log(
+  `🚀 HyperDrop Router Loaded (${routes.length} routes)`
+);
 
 export default routes;
